@@ -1,5 +1,4 @@
 import type { NextPage, GetStaticProps } from "next";
-import Counter from "../features/counter/Counter";
 import Image from "next/image";
 import Header from "../components/Header";
 import { AiOutlineCheck, AiOutlineDown } from "react-icons/ai";
@@ -148,9 +147,9 @@ export default function IndexPage({ shirts, currentIndex }): JSX.Element {
               <h3 className="font-semibold">Filters</h3>
               <div className="">
                 <div>
-                  {filters.map((x) => {
+                  {filters.map((x, i) => {
                     return (
-                      <div className="form-check">
+                      <div className="form-check" key={i}>
                         <input
                           className="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
                           type="radio"
