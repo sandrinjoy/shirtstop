@@ -48,14 +48,14 @@ function Header() {
             </a>
           </Link>
         </div>
-        <div className="flex flex-wrap items-center justify-around gap-2 py-3 md:py-4">
+        <div className="flex flex-row items-center justify-around gap-2 py-3 md:py-4">
           <div className="group relative rounded-md ">
             <RiSearch2Line className="animate-wiggle group-focus-within:animate-none absolute left-3 top-1/2 -mt-2.5 text-slate-400 pointer-events-none  group-focus-within:text-blue-500 dark:text-slate-500" />
             <input
               type="text"
               aria-label="Filter projects"
               placeholder="Search for shirts ..."
-              className="appearance-none w-full text-sm leading-6  border-none bg-slate-100 text-slate-900 placeholder:text-slate-500 rounded-md py-2 pl-10 ring-1 ring-slate-200 shadow-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 dark:text-slate-100 dark:placeholder:text-slate-500 dark:ring-0 dark:focus:ring-2"
+              className="appearance-none w-8/12 sm:w-full  focus:w-full transition-all text-sm leading-6  border-none bg-slate-100 text-slate-900 placeholder:text-slate-500 rounded-md py-2 pl-10 ring-1 ring-slate-200 shadow-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 dark:text-slate-100 dark:placeholder:text-slate-500 dark:ring-0 dark:focus:ring-2"
             />
           </div>
           <div className="flex gap-1">

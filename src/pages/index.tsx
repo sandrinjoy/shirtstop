@@ -9,6 +9,7 @@ import { useEffect, useState, Fragment } from "react";
 
 import shirtsdata from "../../public/data/pink_shirts.json";
 import { Listbox, Transition } from "@headlessui/react";
+import Link from "next/link";
 // interface Shirt {
 //   Brand: string;
 //   Title: string;
@@ -122,7 +123,6 @@ export default function IndexPage({ shirts, currentIndex }): JSX.Element {
     setFilter(fil);
   };
   const loadShirtsSorted = async (data) => {
-    console.log(data);
     if (data.type === sorting) {
       return;
     }
@@ -241,54 +241,58 @@ export default function IndexPage({ shirts, currentIndex }): JSX.Element {
         <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 justify-center  w-10/12 mx-auto gap-10 p-4">
           {items.map((x, i) => {
             return (
-              <div
-                key={i}
-                className="flex mx-auto group flex-col  md:flex-col max-w-[192px] hover:shadow-xl hover:shadow-neutral-300/20   transition hover:cursor-pointer"
-              >
-                {/* image */}
-                <div className=" relative">
-                  <Image width={192} height={255} src={x.images[0].src} />
-                  <div className=" absolute group-hover:hidden   w-full -translate-y-10  px-1 ">
-                    <span className="text-xs text-neutral-900   rounded-full p-2 bg-neutral-50">
-                      {x.rating.toFixed(1)} ⭐ | {x.ratingCount}
-                    </span>
-                  </div>
-                  <div className="hidden group-hover:absolute group-hover:flex  group-hover:justify-start group-hover:items-center w-full -translate-y-10 bg-white px-1 ">
-                    {/* <span className=" flex gap-1 justify-center items-center">
+              <Link href={`shirts/${x.productId}`}>
+                <div
+                  key={i}
+                  className="flex mx-auto group flex-col  md:flex-col max-w-[192px] hover:shadow-xl hover:shadow-neutral-300/20   transition hover:cursor-pointer"
+                >
+                  {/* image */}
+                  <div className=" relative">
+                    <Image width={192} height={255} src={x.images[0].src} />
+                    <div className=" absolute group-hover:hidden   w-full -translate-y-10  px-1 ">
+                      <span className="text-xs text-neutral-900   rounded-full p-2 bg-neutral-50">
+                        {x.rating.toFixed(1)} ⭐ | {x.ratingCount}
+                      </span>
+                    </div>
+                    <div className="hidden group-hover:absolute group-hover:flex  group-hover:justify-start group-hover:items-center w-full -translate-y-10 bg-white px-1 ">
+                      {/* <span className=" flex gap-1 justify-center items-center">
                       {x.sizes.split(",").map((x) => (
                         <span className="text-xs text-gray-500 border-2 border-red-300 rounded-full p-1">
                           {x}
                         </span>
                       ))}
                     </span> */}
-                    <span className="text-xs text-gray-500   rounded-full p-3">
-                      sizes: {x.sizes}
-                    </span>
+                      <span className="text-xs text-gray-500   rounded-full p-3">
+                        sizes: {x.sizes}
+                      </span>
+                    </div>
+                  </div>
+                  {/* details */}
+                  <div className="flex flex-col gap-1 p-3">
+                    <h2 className=" font-semibold text-neutral-900">
+                      {x.brand}
+                    </h2>
+                    <h3 className="  text-sm text-neutral-500 ">
+                      {x.additionalInfo}
+                    </h3>
+                    <h4 className=" font-semibold text-sm text-neutral-900">
+                      {x.price === x.mrp ? (
+                        <span>Rs.{x.price}</span>
+                      ) : (
+                        <div className="flex justify-start items-center gap-1">
+                          <span className="">Rs.{x.price}</span>
+                          <span className="line-through text-xs font-light">
+                            Rs.{x.mrp}
+                          </span>
+                          <span className="text-red-500 font-light text-xs">
+                            {x.discountDisplayLabel}
+                          </span>
+                        </div>
+                      )}
+                    </h4>
                   </div>
                 </div>
-                {/* details */}
-                <div className="flex flex-col gap-1 p-3">
-                  <h2 className=" font-semibold text-neutral-900">{x.brand}</h2>
-                  <h3 className="  text-sm text-neutral-500 ">
-                    {x.additionalInfo}
-                  </h3>
-                  <h4 className=" font-semibold text-sm text-neutral-900">
-                    {x.price === x.mrp ? (
-                      <span>Rs.{x.price}</span>
-                    ) : (
-                      <div className="flex justify-start items-center gap-1">
-                        <span className="">Rs.{x.price}</span>
-                        <span className="line-through text-xs font-light">
-                          Rs.{x.mrp}
-                        </span>
-                        <span className="text-red-500 font-light text-xs">
-                          {x.discountDisplayLabel}
-                        </span>
-                      </div>
-                    )}
-                  </h4>
-                </div>
-              </div>
+              </Link>
             );
           })}
           <div className="flex justify-center items-center">
