@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type itemsState = Object[];
+type itemsState = any[];
 
 const initialState: itemsState = [];
 
@@ -8,8 +8,8 @@ export const itemsSlice = createSlice({
   name: "items",
   initialState,
   reducers: {
-    newItems: (state, action: PayloadAction<object[]>) => action.payload,
-    appendItems: (state, action: PayloadAction<object[]>) => {
+    newItems: (state, action: PayloadAction<any[]>) => action.payload,
+    appendItems: (state, action: PayloadAction<any[]>) => {
       return [...state, ...action.payload];
     },
   },
