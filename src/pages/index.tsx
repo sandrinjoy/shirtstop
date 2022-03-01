@@ -2,6 +2,8 @@ import type { NextPage, GetStaticProps } from "next";
 import Image from "next/image";
 import Header from "../components/Header";
 import { AiOutlineCheck, AiOutlineDown } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { newItems, appendItems } from "../features/items/itemsSlice";
 
 import { HiOutlineSelector } from "react-icons/hi";
 import { useEffect, useState, Fragment } from "react";
@@ -10,6 +12,13 @@ import { useEffect, useState, Fragment } from "react";
 import shirtsdata from "../../public/data/pink_shirts.json";
 import { Listbox, Transition } from "@headlessui/react";
 import Link from "next/link";
+import { RootState } from "../app/store";
+import {
+  changeFilter,
+  changeIndex,
+  changeSearch,
+  changeSort,
+} from "../features/itemMethods/itemMethodsSlice";
 // interface Shirt {
 //   Brand: string;
 //   Title: string;
@@ -80,60 +89,82 @@ export async function getStaticProps() {
   };
 }
 const sort = [
-  { id: 1, name: "default", type: "default", unavailable: false },
+  { id: 1, name: "Recommended", type: "default", unavailable: false },
   { id: 2, name: "price: low to high", type: "low", unavailable: false },
   { id: 3, name: "price: high to low", type: "high", unavailable: false },
   // { id: 4, name: "discount", unavailable: false },
 ];
+
 type Filter = "All" | "Men" | "Women";
+type Sort = "default" | "high" | "low";
+
 const filters = [
   { id: 1, name: "All", unavailable: false },
   { id: 2, name: "Men", unavailable: false },
   { id: 3, name: "Women", unavailable: false },
 ];
 export default function IndexPage({ shirts, currentIndex }): JSX.Element {
-  const [items, setItems] = useState(shirts);
-  const [filter, setFilter] = useState("All");
-  const [sorting, setSorting] = useState("default");
+  const items = useSelector((state: RootState) => state.items);
+  const methods = useSelector((state: RootState) => state.methods);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(newItems(shirts));
+    dispatch(changeIndex(currentIndex));
+  }, []);
+
   const [selectedSort, setSelectedSort] = useState(sort[0]);
-  const [index, setIndex] = useState(currentIndex);
   const loadMore = async () => {
     let res = await fetch(`/api/shirtsbyfilter`, {
       method: "POST",
-      body: JSON.stringify({ from: index, filter, sorting }),
+      body: JSON.stringify({
+        from: methods.index,
+        filter: methods.filter,
+        sorting: methods.sorting,
+        search: methods.search,
+      }),
     });
 
     const resArray: Array<object> = await res.json();
-
-    setItems((x) => [...x, ...resArray]);
-    setIndex(index + resArray.length);
+    dispatch(appendItems(resArray));
+    dispatch(changeIndex(methods.index + resArray.length));
   };
   const loadShirtsfiltered = async (fil) => {
-    if (fil === filter) {
+    if (fil === methods.filter) {
       return;
     }
     let res = await fetch(`/api/shirtsbyfilter`, {
       method: "POST",
-      body: JSON.stringify({ from: 0, filter: fil, sorting }),
+      body: JSON.stringify({
+        from: 0,
+        filter: fil,
+        sorting: methods.sorting,
+        search: methods.search,
+      }),
     });
     const resArray: Array<object> = await res.json();
-    setItems((x) => [...resArray]);
-    setIndex(resArray.length);
-
-    setFilter(fil);
+    dispatch(newItems(resArray));
+    dispatch(changeIndex(resArray.length));
+    dispatch(changeFilter(fil));
   };
   const loadShirtsSorted = async (data) => {
-    if (data.type === sorting) {
+    if (data.type === methods.sorting) {
       return;
     }
     let res = await fetch(`/api/shirtsbyfilter`, {
       method: "POST",
-      body: JSON.stringify({ from: 0, filter, sorting: data.type }),
+      body: JSON.stringify({
+        from: 0,
+        filter: methods.filter,
+        sorting: data.type,
+        search: methods.search,
+      }),
     });
     const resArray: Array<object> = await res.json();
-    setItems((x) => [...resArray]);
-    setIndex(resArray.length);
-    setSorting(data.type);
+    dispatch(newItems(resArray));
+
+    dispatch(changeIndex(resArray.length));
+    dispatch(changeSort(data.type));
     setSelectedSort(data);
   };
   return (
@@ -155,7 +186,7 @@ export default function IndexPage({ shirts, currentIndex }): JSX.Element {
                           type="radio"
                           name="gender"
                           id={x.name}
-                          checked={x.name === filter}
+                          checked={x.name === methods.filter}
                           onChange={() => loadShirtsfiltered(x.name)}
                         />
                         <label
@@ -238,72 +269,78 @@ export default function IndexPage({ shirts, currentIndex }): JSX.Element {
             </div>
           </div>
         </div>
-        <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 justify-center  w-10/12 mx-auto gap-10 p-4">
-          {items.map((x, i) => {
-            return (
-              <Link href={`shirts/${x.productId}`}>
-                <div
-                  key={i}
-                  className="flex mx-auto group flex-col  md:flex-col max-w-[192px] hover:shadow-xl hover:shadow-neutral-300/20   transition hover:cursor-pointer"
-                >
-                  {/* image */}
-                  <div className=" relative">
-                    <Image width={192} height={255} src={x.images[0].src} />
-                    <div className=" absolute group-hover:hidden   w-full -translate-y-10  px-1 ">
-                      <span className="text-xs text-neutral-900   rounded-full p-2 bg-neutral-50">
-                        {x.rating.toFixed(1)} ⭐ | {x.ratingCount}
-                      </span>
-                    </div>
-                    <div className="hidden group-hover:absolute group-hover:flex  group-hover:justify-start group-hover:items-center w-full -translate-y-10 bg-white px-1 ">
-                      {/* <span className=" flex gap-1 justify-center items-center">
+        {items.length > 0 ? (
+          <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 justify-center  w-10/12 mx-auto gap-10 p-4">
+            {items.map((x, i) => {
+              return (
+                <Link href={`shirts/${x.productId}`} key={i}>
+                  <div
+                    key={i}
+                    className="flex mx-auto group flex-col  md:flex-col max-w-[192px] hover:shadow-xl hover:shadow-neutral-300/20   transition hover:cursor-pointer"
+                  >
+                    {/* image */}
+                    <div className=" relative">
+                      <Image width={192} height={255} src={x.images[0].src} />
+                      <div className=" absolute group-hover:hidden   w-full -translate-y-10  px-1 ">
+                        <span className="text-xs text-neutral-900   rounded-full p-2 bg-neutral-50">
+                          {x.rating.toFixed(1)} ⭐ | {x.ratingCount}
+                        </span>
+                      </div>
+                      <div className="hidden group-hover:absolute group-hover:flex  group-hover:justify-start group-hover:items-center w-full -translate-y-10 bg-white px-1 ">
+                        {/* <span className=" flex gap-1 justify-center items-center">
                       {x.sizes.split(",").map((x) => (
                         <span className="text-xs text-gray-500 border-2 border-red-300 rounded-full p-1">
                           {x}
                         </span>
                       ))}
                     </span> */}
-                      <span className="text-xs text-gray-500   rounded-full p-3">
-                        sizes: {x.sizes}
-                      </span>
+                        <span className="text-xs text-gray-500   rounded-full p-3">
+                          sizes: {x.sizes}
+                        </span>
+                      </div>
+                    </div>
+                    {/* details */}
+                    <div className="flex flex-col gap-1 p-3">
+                      <h2 className=" font-semibold text-neutral-900">
+                        {x.brand}
+                      </h2>
+                      <h3 className="  text-sm text-neutral-500 ">
+                        {x.additionalInfo}
+                      </h3>
+                      <h4 className=" font-semibold text-sm text-neutral-900">
+                        {x.price === x.mrp ? (
+                          <span>Rs.{x.price}</span>
+                        ) : (
+                          <div className="flex justify-start items-center gap-1">
+                            <span className="">Rs.{x.price}</span>
+                            <span className="line-through text-xs font-light">
+                              Rs.{x.mrp}
+                            </span>
+                            <span className="text-red-500 font-light text-xs">
+                              {x.discountDisplayLabel}
+                            </span>
+                          </div>
+                        )}
+                      </h4>
                     </div>
                   </div>
-                  {/* details */}
-                  <div className="flex flex-col gap-1 p-3">
-                    <h2 className=" font-semibold text-neutral-900">
-                      {x.brand}
-                    </h2>
-                    <h3 className="  text-sm text-neutral-500 ">
-                      {x.additionalInfo}
-                    </h3>
-                    <h4 className=" font-semibold text-sm text-neutral-900">
-                      {x.price === x.mrp ? (
-                        <span>Rs.{x.price}</span>
-                      ) : (
-                        <div className="flex justify-start items-center gap-1">
-                          <span className="">Rs.{x.price}</span>
-                          <span className="line-through text-xs font-light">
-                            Rs.{x.mrp}
-                          </span>
-                          <span className="text-red-500 font-light text-xs">
-                            {x.discountDisplayLabel}
-                          </span>
-                        </div>
-                      )}
-                    </h4>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-          <div className="flex justify-center items-center">
-            <button
-              onClick={loadMore}
-              className="inline-block px-6 py-2.5 bg-blue-500  text-white font-medium text-xs leading-tight uppercase rounded shadow-md focus:bg-blue-600 hover:shadow-lg  focus:shadow-lg focus:outline-none active:bg-blue-700 focus:ring-0  transition duration-150 ease-in-out"
-            >
-              Load More
-            </button>
+                </Link>
+              );
+            })}
+            <div className="flex justify-center items-center">
+              <button
+                onClick={loadMore}
+                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2  sm:mt-0 sm:ml-3 sm:w-auto "
+              >
+                Load More
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex justify-center items-center m-5 font-bold text-gray-700">
+            No Results Found
+          </div>
+        )}
       </section>
     </>
   );
