@@ -10,7 +10,7 @@ import { useEffect, useState, Fragment } from "react";
 // import shirtsdata from "../../public/data/mytra_minified.json";
 
 import shirtsdata from "../../public/data/pink_shirts.json";
-import { Listbox, Transition } from "@headlessui/react";
+import { Dialog, Listbox, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { RootState } from "../app/store";
 import {
@@ -19,15 +19,6 @@ import {
   changeSearch,
   changeSort,
 } from "../features/itemMethods/itemMethodsSlice";
-// interface Shirt {
-//   Brand: string;
-//   Title: string;
-//   SellingPrice: number;
-//   Price: number | string;
-//   Discount: string;
-// }
-// type Shirts = Shirt[];
-
 // pink shirts keys
 // 0   landingPageUrl                       50 non-null     object
 // 1   loyaltyPointsEnabled                 50 non-null     bool
@@ -114,6 +105,7 @@ export default function IndexPage({ shirts, currentIndex }): JSX.Element {
   }, []);
 
   const [selectedSort, setSelectedSort] = useState(sort[0]);
+  const [isOpenSort, setIsOpenSort] = useState(false);
   const loadMore = async () => {
     let res = await fetch(`/api/shirtsbyfilter`, {
       method: "POST",
@@ -268,6 +260,160 @@ export default function IndexPage({ shirts, currentIndex }): JSX.Element {
               </div>
             </div>
           </div>
+        </div>
+        <div className="flex justify-center items-center md:hidden fixed bottom-0 z-[4] w-full">
+          <button
+            type="button"
+            className=" w-full inline-flex justify-center  border-t border-r border-gray-300  px-4 py-2 bg-white text-xs font-bold text-gray-700 hover:bg-gray-50 focus:outline-none"
+            onClick={() => setIsOpenSort(true)}
+          >
+            Sort / Filters
+          </button>
+          <Transition.Root show={isOpenSort} as={Fragment}>
+            <Dialog
+              as="div"
+              className="fixed z-10 inset-0 overflow-y-auto my-auto rounded "
+              onClose={setIsOpenSort}
+            >
+              <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity " />
+                </Transition.Child>
+
+                {/* This element is to trick the browser into centering the modal contents. */}
+                <span
+                  className="hidden sm:inline-block sm:align-middle sm:h-screen"
+                  aria-hidden="true"
+                >
+                  &#8203;
+                </span>
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  enterTo="opacity-100 translate-y-0 sm:scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                  leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                >
+                  <div className="inline-block w-full align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg ">
+                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                      <div className="">
+                        <div className="mt-3  sm:mt-0 sm:ml-4 text-left flex flex-col gap-10">
+                          {/* content */}
+                          <div className="flex flex-col gap-1">
+                            <h3 className="font-semibold">Sort By</h3>
+                            <div className="w-full  top-16">
+                              <Listbox
+                                value={selectedSort}
+                                onChange={(x) => loadShirtsSorted(x)}
+                              >
+                                <div className="relative mt-1">
+                                  <Listbox.Button className="relative w-full py-2 pl-3 pr-10 text-left bg-white rounded-lg shadow-md cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
+                                    <span className="block truncate">
+                                      {selectedSort.name}
+                                    </span>
+                                    <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                      <HiOutlineSelector />
+                                    </span>
+                                  </Listbox.Button>
+                                  <Transition
+                                    as={Fragment}
+                                    enter="transition duration-100 ease-out"
+                                    enterFrom="transform scale-95 opacity-0"
+                                    enterTo="transform scale-100 opacity-100"
+                                    leave="transition duration-75 ease-out"
+                                    leaveFrom="transform scale-100 opacity-100"
+                                    leaveTo="transform scale-95 opacity-0"
+                                  >
+                                    <Listbox.Options className="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                      {sort.map((method) => (
+                                        <Listbox.Option
+                                          key={method.id}
+                                          value={method}
+                                          disabled={method.unavailable}
+                                          className={({ active }) =>
+                                            `cursor-default select-none relative py-2 pl-10 pr-4 ${
+                                              active
+                                                ? "text-amber-900 bg-amber-100"
+                                                : "text-gray-900"
+                                            }`
+                                          }
+                                        >
+                                          {({ selected }) => (
+                                            <>
+                                              <span
+                                                className={`block truncate ${
+                                                  selected
+                                                    ? "font-medium"
+                                                    : "font-normal"
+                                                }`}
+                                              >
+                                                {method.name}
+                                              </span>
+                                              {selected ? (
+                                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                                                  <AiOutlineCheck
+                                                    className="w-5 h-5"
+                                                    aria-hidden="true"
+                                                  />
+                                                </span>
+                                              ) : null}
+                                            </>
+                                          )}
+                                        </Listbox.Option>
+                                      ))}
+                                    </Listbox.Options>
+                                  </Transition>
+                                </div>
+                              </Listbox>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <h3 className="font-semibold">Filters</h3>
+                            <div className="">
+                              <div>
+                                {filters.map((x, i) => {
+                                  return (
+                                    <div className="form-check" key={i}>
+                                      <input
+                                        className="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
+                                        type="radio"
+                                        name="gender"
+                                        id={x.name}
+                                        checked={x.name === methods.filter}
+                                        onChange={() =>
+                                          loadShirtsfiltered(x.name)
+                                        }
+                                      />
+                                      <label
+                                        className="form-check-label inline-block text-gray-800 text-sm font-semibold"
+                                        htmlFor={x.name}
+                                      >
+                                        {x.name}
+                                      </label>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Transition.Child>
+              </div>
+            </Dialog>
+          </Transition.Root>
         </div>
         {items.length > 0 ? (
           <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 justify-center  w-10/12 mx-auto gap-10 p-4">
