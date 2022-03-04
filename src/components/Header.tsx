@@ -1,9 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useRef, useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { FiExternalLink } from "react-icons/fi";
 import {
   RiUserFill,
   RiUserLine,
@@ -12,7 +11,6 @@ import {
   RiShoppingBasketFill,
   RiShoppingBasketLine,
   RiSearch2Line,
-  RiSearch2Fill,
 } from "react-icons/ri";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -21,46 +19,16 @@ import { removeItem, addItem } from "../features/cart/cartSlice";
 
 import { removeItem as removeItemWish } from "../features/wishlist/wishlistSlice";
 
-import { newItems, appendItems } from "../features/items/itemsSlice";
-import { changeSearch } from "../features/itemMethods/itemMethodsSlice";
 function Header() {
   const dispatch = useDispatch();
-
-  const methods = useSelector((state: RootState) => state.methods);
+  const [search, setSearch] = useState("");
   const items = useSelector((state: RootState) => state.cart);
 
   const wish = useSelector((state: RootState) => state.wishlist);
   const router = useRouter();
-  const [showBorder, setShowBorder] = useState(false);
   const [isOpenCart, setIsOpenCart] = useState(false);
-  const [input, setInput] = useState("");
   const [isOpenWish, setIsOpenWish] = useState(false);
   const [total, setTotal] = useState(0);
-  function handleScroll() {
-    const position = window.scrollY;
-    setShowBorder(position > 40);
-  }
-  const searchHandle = async (data) => {
-    let res = await fetch(`/api/shirtsbyfilter`, {
-      method: "POST",
-      body: JSON.stringify({
-        from: 0,
-        filter: methods.filter,
-        sorting: methods.sorting,
-        search: data,
-      }),
-    });
-    const resArray: Array<object> = await res.json();
-    dispatch(newItems(resArray));
-    dispatch(changeSearch(data));
-  };
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  });
 
   useEffect(() => {
     const sumOfItems = () => {
@@ -72,14 +40,16 @@ function Header() {
     };
     sumOfItems();
   }, [items]);
+  const searchFor = async (word) => {
+    if (word === "") return;
+    await router.push(`/?search=${word}`);
+    setSearch("");
+  };
   return (
     <header className="z-[9] bg-white shadow sticky top-0 w-full px-5 flex flex-col md:flex-row justify-center items-center md:justify-between  transition duration-300 ease-in-out">
       <nav
-        className={
-          showBorder
-            ? `w-full  flex  flex-col md:flex-row justify-center items-center md:justify-between max-w-[1200px] mx-auto border-b transition-all`
-            : `w-full  flex  flex-col md:flex-row justify-center items-center md:justify-between max-w-[1200px] mx-auto transition-all border-b border-neutral-50 `
-        }
+        className="
+           w-full  flex  flex-col md:flex-row justify-center items-center md:justify-between max-w-[1200px] mx-auto   transition-all"
       >
         <div className="flex items-center justify-center py-2 md:py-4">
           <Link href="/" passHref>
@@ -95,29 +65,15 @@ function Header() {
           <div className="group flex justify-center rounded-r-md gap-1  ">
             <input
               type="text"
-              value={methods.search}
-              onChange={(e) => dispatch(changeSearch(e.currentTarget.value))}
+              value={search}
+              onChange={(e) => setSearch(e.currentTarget.value)}
               aria-label="Filter projects"
               placeholder="Search for shirts ..."
               className="appearance-none w-8/12  focus:w-full transition-all text-sm leading-6  border-none bg-slate-100 text-slate-900 placeholder:text-slate-500 rounded-md py-2  ring-1 ring-slate-200 shadow-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 dark:text-slate-100 dark:placeholder:text-slate-500 dark:ring-0 dark:focus:ring-2"
             />
-            <div className="flex flex-col gap-1">
-              {methods.search === "" ? (
-                ""
-              ) : (
-                <button
-                  type="button"
-                  className="text-sm leading-6  border-none  text-neutral-900  rounded-md py-2  ring-1 ring-slate-200 shadow-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 dark:text-slate-100  dark:ring-0 dark:focus:ring-2 px-2 "
-                  onClick={() => {
-                    searchHandle("");
-                  }}
-                >
-                  ❌
-                </button>
-              )}
-            </div>
+
             <button
-              onClick={() => searchHandle(methods.search)}
+              onClick={() => searchFor(search)}
               className="text-sm leading-6  border-none  text-neutral-900  rounded-md py-2  ring-1 ring-slate-200 shadow-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 dark:text-slate-100  dark:ring-0 dark:focus:ring-2 px-2"
             >
               <RiSearch2Line className="animate-wiggle group-focus-within:animate-none   text-slate-400 pointer-events-none  group-focus-within:text-blue-500 " />
@@ -231,7 +187,7 @@ function Header() {
                     leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                   >
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-lg">
                       <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div className="">
                           <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -353,7 +309,7 @@ function Header() {
                     leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                   >
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-lg">
                       <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div className="">
                           <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
