@@ -70,13 +70,57 @@ import {
 // 47  systemAttributes                     50 non-null     object
 // 48  attributeTagsPriorityList            50 non-null     object
 // 49  preferredDeliveryTag                 50 non-null     object
-export async function getStaticProps() {
-  const from = 0,
-    count = 9;
 
-  const shirts = shirtsdata.slice(from, count);
+// export async function getStaticProps() {
+//   const from = 0,
+//     count = 9;
+
+//   const shirts = shirtsdata.slice(from, count);
+//   return {
+//     props: { shirts, currentIndex: from + count },
+//   };
+// }
+
+type Filter = "All" | "Men" | "Women";
+type Sort = "default" | "high" | "low";
+
+export async function getServerSideProps(context) {
+  console.log(context.query);
+  //  default query values
+  let {
+    page = 1,
+    filter = "All",
+    sorting = "default",
+    search = "",
+  } = context.query;
+  const shirts = shirtsdata;
+  let sorted = shirts;
+  if (filter !== "All") {
+    sorted = sorted.filter((x) => x.gender === filter);
+  }
+  if (sorting === "low") {
+    sorted = sorted.sort((a, b) => a.price - b.price);
+  } else if (sorting === "high") {
+    sorted = sorted.sort((a, b) => a.price - b.price);
+    sorted = sorted.reverse();
+  } else if (sorting === "default") {
+    sorted = sorted.sort((a, b) => a.ratingCount - b.ratingCount);
+    sorted = sorted.reverse();
+  }
+  if (search !== "") {
+    sorted = sorted.filter((x) => {
+      if (
+        x.brand.toLowerCase().includes(search) ||
+        x.productName.toLowerCase().includes(search) ||
+        x.additionalInfo.toLowerCase().includes(search)
+      )
+        return true;
+    });
+  }
+  const maxPages = sorted.length / 9;
+  sorted = sorted.slice(page * 9 - 9, page * 9);
   return {
-    props: { shirts, currentIndex: from + count },
+    props: { shirts: sorted, page, filter, sorting, search, maxPages },
   };
 }
 const sort = [
@@ -86,26 +130,30 @@ const sort = [
   // { id: 4, name: "discount", unavailable: false },
 ];
 
-type Filter = "All" | "Men" | "Women";
-type Sort = "default" | "high" | "low";
-
 const filters = [
   { id: 1, name: "All", unavailable: false },
   { id: 2, name: "Men", unavailable: false },
   { id: 3, name: "Women", unavailable: false },
 ];
-export default function IndexPage({ shirts, currentIndex }): JSX.Element {
+export default function IndexPage({
+  shirts,
+  page,
+  filter,
+  sorting,
+  search,
+  maxPages,
+}): JSX.Element {
   const items = useSelector((state: RootState) => state.items);
   const methods = useSelector((state: RootState) => state.methods);
 
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(newItems(shirts));
-    dispatch(changeIndex(currentIndex));
   }, []);
 
   const [selectedSort, setSelectedSort] = useState(sort[0]);
   const [isOpenSort, setIsOpenSort] = useState(false);
+
   const loadMore = async () => {
     let res = await fetch(`/api/shirtsbyfilter`, {
       method: "POST",
@@ -415,78 +463,103 @@ export default function IndexPage({ shirts, currentIndex }): JSX.Element {
             </Dialog>
           </Transition.Root>
         </div>
-        {items.length > 0 ? (
-          <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 justify-center  w-10/12 mx-auto gap-10 p-4">
-            {items.map((x, i) => {
-              return (
-                <Link href={`shirts/${x.productId}`} key={i}>
-                  <div
-                    key={i}
-                    className="flex mx-auto group flex-col  md:flex-col max-w-[192px] hover:shadow-xl hover:shadow-neutral-300/20   transition hover:cursor-pointer"
-                  >
-                    {/* image */}
-                    <div className=" relative">
-                      <Image width={192} height={255} src={x.images[0].src} />
-                      <div className=" absolute group-hover:hidden   w-full -translate-y-10  px-1 ">
-                        <span className="text-xs text-neutral-900   rounded-full p-2 bg-neutral-50">
-                          {x.rating.toFixed(1)} ⭐ | {x.ratingCount}
-                        </span>
-                      </div>
-                      <div className="hidden group-hover:absolute group-hover:flex  group-hover:justify-start group-hover:items-center w-full -translate-y-10 bg-white px-1 ">
-                        {/* <span className=" flex gap-1 justify-center items-center">
+        <div className="w-10/12 mx-auto">
+          {items.length > 0 ? (
+            <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 justify-center   mx-auto gap-10 p-4">
+              {items.map((x, i) => {
+                return (
+                  <Link href={`shirts/${x.productId}`} key={i}>
+                    <div
+                      key={i}
+                      className="flex mx-auto group flex-col  md:flex-col max-w-[192px] hover:shadow-xl hover:shadow-neutral-300/20   transition hover:cursor-pointer"
+                    >
+                      {/* image */}
+                      <div className=" relative">
+                        <Image width={192} height={255} src={x.images[0].src} />
+                        <div className=" absolute group-hover:hidden   w-full -translate-y-10  px-1 ">
+                          <span className="text-xs text-neutral-900   rounded-full p-2 bg-neutral-50">
+                            {x.rating.toFixed(1)} ⭐ | {x.ratingCount}
+                          </span>
+                        </div>
+                        <div className="hidden group-hover:absolute group-hover:flex  group-hover:justify-start group-hover:items-center w-full -translate-y-10 bg-white px-1 ">
+                          {/* <span className=" flex gap-1 justify-center items-center">
                       {x.sizes.split(",").map((x) => (
                         <span className="text-xs text-gray-500 border-2 border-red-300 rounded-full p-1">
                           {x}
                         </span>
                       ))}
                     </span> */}
-                        <span className="text-xs text-gray-500   rounded-full p-3">
-                          sizes: {x.sizes}
-                        </span>
+                          <span className="text-xs text-gray-500   rounded-full p-3">
+                            sizes: {x.sizes}
+                          </span>
+                        </div>
+                      </div>
+                      {/* details */}
+                      <div className="flex flex-col gap-1 p-3">
+                        <h2 className=" font-semibold text-neutral-900">
+                          {x.brand}
+                        </h2>
+                        <h3 className="  text-sm text-neutral-500 ">
+                          {x.additionalInfo}
+                        </h3>
+                        <h4 className=" font-semibold text-sm text-neutral-900">
+                          {x.price === x.mrp ? (
+                            <span>Rs.{x.price}</span>
+                          ) : (
+                            <div className="flex justify-start items-center gap-1">
+                              <span className="">Rs.{x.price}</span>
+                              <span className="line-through text-xs font-light">
+                                Rs.{x.mrp}
+                              </span>
+                              <span className="text-red-500 font-light text-xs">
+                                {x.discountDisplayLabel}
+                              </span>
+                            </div>
+                          )}
+                        </h4>
                       </div>
                     </div>
-                    {/* details */}
-                    <div className="flex flex-col gap-1 p-3">
-                      <h2 className=" font-semibold text-neutral-900">
-                        {x.brand}
-                      </h2>
-                      <h3 className="  text-sm text-neutral-500 ">
-                        {x.additionalInfo}
-                      </h3>
-                      <h4 className=" font-semibold text-sm text-neutral-900">
-                        {x.price === x.mrp ? (
-                          <span>Rs.{x.price}</span>
-                        ) : (
-                          <div className="flex justify-start items-center gap-1">
-                            <span className="">Rs.{x.price}</span>
-                            <span className="line-through text-xs font-light">
-                              Rs.{x.mrp}
-                            </span>
-                            <span className="text-red-500 font-light text-xs">
-                              {x.discountDisplayLabel}
-                            </span>
-                          </div>
-                        )}
-                      </h4>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-            <div className="flex justify-center items-center">
-              <button
-                onClick={loadMore}
-                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2  sm:mt-0 sm:ml-3 sm:w-auto "
-              >
-                Load More
-              </button>
+                  </Link>
+                );
+              })}
+              <div className="flex justify-center items-center">
+                <button
+                  onClick={loadMore}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2  sm:mt-0 sm:ml-3 sm:w-auto "
+                >
+                  Load More
+                </button>
+              </div>
             </div>
+          ) : (
+            <div className="flex justify-center items-center m-5 font-bold text-gray-700">
+              No Results Found
+            </div>
+          )}
+          <div className="mx-auto pb-10">
+            <ul className="flex justify-center items-center mx-auto ">
+              {Array.from(Array(parseInt(maxPages)), (e, i) => {
+                {
+                  return i + 1 === parseInt(page) ? (
+                    <li
+                      key={i}
+                      className="h-10 w-10 flex justify-center items-center p-2 shadow text-white bg-neutral-800"
+                    >
+                      {i + 1}
+                    </li>
+                  ) : (
+                    <li
+                      key={i}
+                      className="h-10 w-10 flex justify-center items-center p-2 shadow"
+                    >
+                      {i + 1}
+                    </li>
+                  );
+                }
+              })}
+            </ul>
           </div>
-        ) : (
-          <div className="flex justify-center items-center m-5 font-bold text-gray-700">
-            No Results Found
-          </div>
-        )}
+        </div>
       </section>
     </>
   );
