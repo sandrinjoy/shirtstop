@@ -6,6 +6,7 @@ An implementation of a shopping site pages such as list page and product page , 
 
     -Items Page/Home
     -individual Product Pages (generated during build)
+    -Pagination
     -Sort by Reviews,low to high pricing and vice versa
     -Filter by All, Men, Women
     -Search - filtered based on the given string is present in the product name, description or brand name
@@ -19,5 +20,6 @@ An implementation of a shopping site pages such as list page and product page , 
     - NextJS
     - Typescript
     - Tailwind + HeadlessUI
-    - Redux/Redux-toolkit - State Management (Cart, wishlist, items, search params{filter, sort, keywords})
+    - Redux/Redux-toolkit - State Management (Cart & wishlist)
+    - Server Side Props to handle data requests
     - firebase - for database & auth purposes , just in case if I want to link to database and add user authentication
