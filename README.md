@@ -14,6 +14,7 @@ An implementation of a shopping site pages such as list page and product page , 
     -Wishlist Items
     -Removing items from cart and wishlist
     -Moving item from wishlist to cart
+    - Local Store for Cart & Wishlist
 
 ## TechStack
 
@@ -21,5 +22,6 @@ An implementation of a shopping site pages such as list page and product page , 
     - Typescript
     - Tailwind + HeadlessUI
     - Redux/Redux-toolkit - State Management (Cart & wishlist)
+    - Redux Persist for local storage
     - Server Side Props to handle data requests
     - firebase - for database & auth purposes , just in case if I want to link to database and add user authentication

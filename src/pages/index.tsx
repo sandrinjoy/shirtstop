@@ -472,7 +472,7 @@ export default function IndexPage({
                 })}
               </div>
               <div className="mx-auto pb-10">
-                <ul className="flex flex-wrap mx-auto justify-center gap-1 items-center mx-auto ">
+                <ul className="flex flex-wrap mx-auto justify-center gap-1 items-center  ">
                   {Array.from(Array(Math.ceil(maxPages)), (e, i) => {
                     {
                       return i + 1 === Math.ceil(page) ? (

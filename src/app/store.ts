@@ -4,16 +4,35 @@ import cartReducer from "../features/cart/cartSlice";
 
 import wishlistReducer from "../features/wishlist/wishlistSlice";
 
+// redux persist import requirements
+import storage from "redux-persist/lib/storage";
+import { combineReducers } from "redux";
+import { persistReducer, persistStore } from "redux-persist";
+
+// just to organise reducers into one single reducer
+const reducer = combineReducers({
+  cart: cartReducer,
+  wishlist: wishlistReducer,
+});
+
+// probably some default persist format
+const persistConfig = {
+  key: "root",
+  storage,
+  // blacklist :['whatever reducers not to persist']
+};
+
+const persistedReducer = persistReducer(persistConfig, reducer);
+
 export function makeStore() {
   return configureStore({
-    reducer: {
-      cart: cartReducer,
-      wishlist: wishlistReducer,
-    },
+    reducer: persistedReducer,
   });
 }
-const store = makeStore();
 
+let store = makeStore();
+let persistor = persistStore(store);
+export { store, persistor };
 export type AppState = ReturnType<typeof store.getState>;
 
 export type AppDispatch = typeof store.dispatch;
@@ -25,5 +44,3 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   unknown,
   Action<string>
 >;
-
-export default store;
