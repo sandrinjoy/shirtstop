@@ -1,5 +1,5 @@
 import shirtsdata from "../../../public/data/pink_shirts.json";
-import Header from "../../components/Header";
+import Header from "../../components/Navbar/Header";
 import Image from "next/image";
 import { nanoid } from "nanoid";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,7 +36,7 @@ export default function Item({ product }) {
   return (
     <>
       <Header />
-      <div className="grid md:grid-cols-2 mx-auto group flex-row mt-3    ">
+      <div className="grid flex-row mx-auto mt-3 md:grid-cols-2 group ">
         {/* image */}
         <div className=" flex flex-wrap max-h-[85vh] overflow-y-auto gap-2 justify-center items-center order-last md:order-first  ">
           {product.images.map((x, i) => {
@@ -58,49 +58,49 @@ export default function Item({ product }) {
         </div>
         {/* details */}
 
-        <div className="flex flex-col justify-start items-start gap-1 p-3 ">
-          <h2 className=" font-bold text-2xl text-neutral-900">
+        <div className="flex flex-col items-start justify-start gap-1 p-3 ">
+          <h2 className="text-2xl font-bold  text-neutral-900">
             {product.brand}
           </h2>
-          <h3 className="  text-sm font-light text-neutral-700 ">
+          <h3 className="text-sm font-light  text-neutral-700">
             {product.productName}
           </h3>
-          <h3 className="  text-lg font-light text-neutral-500 ">
+          <h3 className="text-lg font-light  text-neutral-500">
             {product.additionalInfo}
           </h3>
-          <div className=" text-neutral-900  px-2 py-4 my-3 font-light border ">
+          <div className="px-2 py-4 my-3 font-light border  text-neutral-900">
             <span className="font-bold"> {product.rating.toFixed(1)}</span> ⭐ |{" "}
             {product.ratingCount} Ratings
           </div>
-          <h4 className=" font-semibold text-xl text-neutral-900">
+          <h4 className="text-xl font-semibold  text-neutral-900">
             {product.price === product.mrp ? (
               <span>Rs.{product.price}</span>
             ) : (
-              <div className="flex justify-start items-center gap-3">
+              <div className="flex items-center justify-start gap-3">
                 <span className="">Rs.{product.price}</span>
-                <span className="line-through text-lg font-light">
+                <span className="text-lg font-light line-through">
                   Rs.{product.mrp}
                 </span>
-                <span className="text-red-500 font-medium text-lg">
+                <span className="text-lg font-medium text-red-500">
                   {product.discountDisplayLabel}
                 </span>
               </div>
             )}
           </h4>
-          <span className=" text-xs text-green-500 font-semibold">
+          <span className="text-xs font-semibold text-green-500 ">
             inclusive of all taxes
           </span>
 
-          <div className="  flex flex-col  bg-white  ">
-            {/* <span className=" flex gap-1 justify-center items-center">
+          <div className="flex flex-col bg-white ">
+            {/* <span className="flex items-center justify-center gap-1 ">
                       {product.sizes.split(",").map((x) => (
-                        <span className="text-xs text-gray-500 border-2 border-red-300 rounded-full p-1">
+                        <span className="p-1 text-xs text-gray-500 border-2 border-red-300 rounded-full">
                           {x}
                         </span>
                       ))}
                     </span> */}
-            <span className=" my-2 font-medium">SELECT SIZE </span>
-            <div className="flex justify-start items-center gap-4 my-3">
+            <span className="my-2 font-medium ">SELECT SIZE </span>
+            <div className="flex items-center justify-start gap-4 my-3">
               {product.sizes.split(",").map((x, i) => {
                 return (
                   <button
@@ -118,7 +118,7 @@ export default function Item({ product }) {
               })}
             </div>
           </div>
-          <div className="flex justify-start items-center gap-2 my-3">
+          <div className="flex items-center justify-start gap-2 my-3">
             <button
               type="button"
               onClick={() =>
@@ -153,10 +153,10 @@ export default function Item({ product }) {
       <Transition.Root show={isImageModal} as={Fragment}>
         <Dialog
           as="div"
-          className="fixed z-10 inset-0 overflow-y-auto my-auto rounded"
+          className="fixed inset-0 z-10 my-auto overflow-y-auto rounded"
           onClose={setIsImageModal}
         >
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -166,7 +166,7 @@ export default function Item({ product }) {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity " />
+              <Dialog.Overlay className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 " />
             </Transition.Child>
 
             {/* This element is to trick the browser into centering the modal contents. */}
@@ -185,10 +185,10 @@ export default function Item({ product }) {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <div className="inline-block align-bottom  rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div className=" max-h-screen">
+              <div className="inline-block overflow-hidden text-left align-bottom transition-all transform rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div className="max-h-screen ">
                   <button
-                    className="r-0 w-full inline-flex justify-center   border-gray-300 shadow-sm px-4 py-2 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none  "
+                    className="inline-flex justify-center w-full px-4 py-2 text-xs font-medium text-gray-700 bg-white border-gray-300 shadow-sm r-0 hover:bg-gray-50 focus:outline-none "
                     onClick={() => setIsImageModal(false)}
                   >
                     close
