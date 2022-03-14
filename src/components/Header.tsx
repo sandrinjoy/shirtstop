@@ -55,28 +55,28 @@ function Header() {
           <Link href="/" passHref>
             <a
               aria-label="homepage"
-              className="flex justify-center items-center"
+              className="flex items-center justify-center"
             >
               <Image src="/logo.svg" width={168} height={35} />
             </a>
           </Link>
         </div>
-        <div className="flex flex-col sm:flex-row items-center justify-around gap-5 py-3 md:py-4">
-          <div className="group flex justify-center rounded-r-md gap-1  ">
+        <div className="flex flex-col items-center justify-around gap-5 py-3 sm:flex-row md:py-4">
+          <div className="flex justify-center gap-1 group">
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.currentTarget.value)}
               aria-label="Filter projects"
               placeholder="Search for shirts ..."
-              className="appearance-none w-8/12  focus:w-full transition-all text-sm leading-6  border-none bg-slate-100 text-slate-900 placeholder:text-slate-500 rounded-md py-2  ring-1 ring-slate-200 shadow-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 dark:text-slate-100 dark:placeholder:text-slate-500 dark:ring-0 dark:focus:ring-2"
+              className="w-full py-2 text-sm leading-6 transition border-2 border-transparent rounded-lg outline-none bg-slate-100 focus:ring-0 focus:outline-none text-slate-900 placeholder:text-slate-500 focus:bg-white focus:border-slate-200 "
             />
 
             <button
               onClick={() => searchFor(search)}
-              className="text-sm leading-6  border-none  text-neutral-900  rounded-md py-2  ring-1 ring-slate-200 shadow-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 dark:text-slate-100  dark:ring-0 dark:focus:ring-2 px-2"
+              className="px-2 py-2 text-sm leading-6 transition border-2 rounded-lg text-neutral-900 border-slate-200 focus:outline-none focus:bg-white active:bg-slate-100 focus:border-blue-500"
             >
-              <RiSearch2Line className="animate-wiggle group-focus-within:animate-none   text-slate-400 pointer-events-none  group-focus-within:text-blue-500 " />
+              <RiSearch2Line className="pointer-events-none animate-wiggle group-focus-within:animate-none text-slate-400 group-focus-within:text-blue-500 " />
             </button>
           </div>
           <div className="flex gap-1">
@@ -155,10 +155,10 @@ function Header() {
             <Transition.Root show={isOpenCart} as={Fragment}>
               <Dialog
                 as="div"
-                className="fixed z-10 inset-0 overflow-y-auto my-auto rounded"
+                className="fixed inset-0 z-10 my-auto overflow-y-auto rounded"
                 onClose={setIsOpenCart}
               >
-                <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                   <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -168,7 +168,7 @@ function Header() {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                   >
-                    <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity " />
+                    <Dialog.Overlay className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 " />
                   </Transition.Child>
 
                   {/* This element is to trick the browser into centering the modal contents. */}
@@ -187,13 +187,13 @@ function Header() {
                     leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                   >
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-lg">
-                      <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div className="inline-block w-full overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg">
+                      <div className="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
                         <div className="">
                           <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                             <Dialog.Title
                               as="h3"
-                              className="text-lg leading-6 font-medium text-gray-900"
+                              className="text-lg font-medium leading-6 text-gray-900"
                             >
                               Your Cart
                             </Dialog.Title>
@@ -210,10 +210,10 @@ function Header() {
                                   return (
                                     <div
                                       key={x.id}
-                                      className="flex mx-auto group  w-full border-b  mt-1    transition "
+                                      className="flex w-full mx-auto mt-1 transition border-b group "
                                     >
                                       {/* image */}
-                                      <div className=" relative">
+                                      <div className="relative ">
                                         <Image
                                           width={192 * 0.5}
                                           height={255 * 0.5}
@@ -222,25 +222,25 @@ function Header() {
                                       </div>
                                       {/* details */}
                                       <div className="flex flex-col gap-1 p-3">
-                                        <h2 className=" font-semibold text-neutral-900">
+                                        <h2 className="font-semibold text-neutral-900">
                                           {x.item.brand}
                                         </h2>
-                                        <h3 className="  text-sm text-neutral-500 flex gap-2 justify-start items-center">
-                                          <span className="p-4 text-xs rounded-full border w-5 h-5  flex justify-center items-center transition ">
+                                        <h3 className="flex items-center justify-start gap-2 text-sm text-neutral-500">
+                                          <span className="flex items-center justify-center w-5 h-5 p-4 text-xs transition border rounded-full ">
                                             {x.item.size}
                                           </span>{" "}
                                           {x.item.additionalInfo}
                                         </h3>
-                                        <h4 className=" font-semibold text-sm text-neutral-900">
+                                        <h4 className="text-sm font-semibold text-neutral-900">
                                           {x.item.price === x.item.mrp ? (
                                             <span>Rs.{x.item.price}</span>
                                           ) : (
-                                            <div className="flex justify-start items-center gap-2">
+                                            <div className="flex items-center justify-start gap-2">
                                               <span className="">
                                                 Rs.{x.item.price}
                                               </span>
 
-                                              <span className="line-through text-xs font-light">
+                                              <span className="text-xs font-light line-through">
                                                 Rs.{x.item.mrp}
                                               </span>
                                             </div>
@@ -249,7 +249,7 @@ function Header() {
 
                                         <button
                                           type="button"
-                                          className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2  sm:mt-0 sm:ml-3 sm:w-auto "
+                                          className="inline-flex justify-center w-full px-4 py-2 mt-3 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto "
                                           onClick={() =>
                                             dispatch(removeItem(x))
                                           }
@@ -277,10 +277,10 @@ function Header() {
             <Transition.Root show={isOpenWish} as={Fragment}>
               <Dialog
                 as="div"
-                className="fixed z-10 inset-0 overflow-y-auto my-auto rounded"
+                className="fixed inset-0 z-10 my-auto overflow-y-auto rounded"
                 onClose={setIsOpenWish}
               >
-                <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                   <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -290,7 +290,7 @@ function Header() {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                   >
-                    <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity " />
+                    <Dialog.Overlay className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 " />
                   </Transition.Child>
 
                   {/* This element is to trick the browser into centering the modal contents. */}
@@ -309,13 +309,13 @@ function Header() {
                     leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                   >
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-lg">
-                      <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div className="inline-block w-full overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg">
+                      <div className="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
                         <div className="">
                           <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                             <Dialog.Title
                               as="h3"
-                              className="text-lg leading-6 font-medium text-gray-900"
+                              className="text-lg font-medium leading-6 text-gray-900"
                             >
                               Your WishList
                             </Dialog.Title>
@@ -325,10 +325,10 @@ function Header() {
                                   return (
                                     <div
                                       key={x.id}
-                                      className="flex mx-auto group  w-full border-b  mt-1    transition "
+                                      className="flex w-full mx-auto mt-1 transition border-b group "
                                     >
                                       {/* image */}
-                                      <div className=" relative">
+                                      <div className="relative ">
                                         <Image
                                           width={192 * 0.5}
                                           height={255 * 0.5}
@@ -337,25 +337,25 @@ function Header() {
                                       </div>
                                       {/* details */}
                                       <div className="flex flex-col gap-1 p-3">
-                                        <h2 className=" font-semibold text-neutral-900">
+                                        <h2 className="font-semibold text-neutral-900">
                                           {x.item.brand}
                                         </h2>
-                                        <h3 className="  text-sm text-neutral-500 flex gap-2 justify-start items-center">
-                                          <span className="p-4 text-xs rounded-full border w-5 h-5  flex justify-center items-center transition ">
+                                        <h3 className="flex items-center justify-start gap-2 text-sm text-neutral-500">
+                                          <span className="flex items-center justify-center w-5 h-5 p-4 text-xs transition border rounded-full ">
                                             {x.item.size}
                                           </span>{" "}
                                           {x.item.additionalInfo}
                                         </h3>
-                                        <h4 className=" font-semibold text-sm text-neutral-900">
+                                        <h4 className="text-sm font-semibold text-neutral-900">
                                           {x.item.price === x.item.mrp ? (
                                             <span>Rs.{x.item.price}</span>
                                           ) : (
-                                            <div className="flex justify-start items-center gap-2">
+                                            <div className="flex items-center justify-start gap-2">
                                               <span className="">
                                                 Rs.{x.item.price}
                                               </span>
 
-                                              <span className="line-through text-xs font-light">
+                                              <span className="text-xs font-light line-through">
                                                 Rs.{x.item.mrp}
                                               </span>
                                             </div>
@@ -364,7 +364,7 @@ function Header() {
 
                                         <button
                                           type="button"
-                                          className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-xs font-medium text-red-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2  sm:mt-0 sm:ml-3 sm:w-auto "
+                                          className="inline-flex justify-center w-full px-4 py-2 mt-3 text-xs font-medium text-red-600 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto "
                                           onClick={() => {
                                             dispatch(addItem(x));
                                             dispatch(removeItemWish(x));
@@ -374,7 +374,7 @@ function Header() {
                                         </button>
                                         <button
                                           type="button"
-                                          className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2  sm:mt-0 sm:ml-3 sm:w-auto "
+                                          className="inline-flex justify-center w-full px-4 py-2 mt-3 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto "
                                           onClick={() =>
                                             dispatch(removeItemWish(x))
                                           }
